@@ -5,7 +5,7 @@ Tired of refreshing for grades coming, I decided to write this using Selenium in
 
 You need to first create a `.env` file aside cloned files and enter username and password to your Golestan login page in it using this format:
 ```
-USERNAME=<your username>
+UID=<your username>
 PASSWORD=<your password>
 ```
 If you want Telegram notifications, you can add `TOKEN` and `CHAT_ID` pairs which are the token of your bot and the chat id (the numerical id) of your Telegram account, respectively. Also you must set the `tele_notif` to `true` in `config.json` file. (You may want to check [Telegram bots page](https://core.telegram.org/bots) if you're not familiar with them)
@@ -28,5 +28,3 @@ Finally, you can run the `main.py` file using `./main.py` or `python3 main.py`.
 * python-telegram-bot (If you want Telegram notifications, too) `pip3 install python-telegram-bot`
 * kavenegar SDK (If you want SMS notifications, too) `pip install kavenegar`
 
-#### Note:
-This project sends desktop notifications in Linux Operating System (using `notify-send`) and MacOs (using [`terminal-notifier`](https://github.com/julienXX/terminal-notifier)). It is not tested on Windows and other OSs.
