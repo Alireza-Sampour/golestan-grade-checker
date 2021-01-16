@@ -22,7 +22,7 @@ class GolestanGradeCheckerConfig:
         env_path = Path('./env') / '.env'
         load_dotenv(dotenv_path=str(env_path))
 
-        username = os.getenv("USERNAME")
+        username = os.getenv("UID")
         password = os.getenv("PASSWORD")
         tg_token = os.getenv("TOKEN")
         tg_chat_id = os.getenv("CHAT_ID")
