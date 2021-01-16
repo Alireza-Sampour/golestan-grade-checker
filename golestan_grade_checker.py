@@ -64,7 +64,7 @@ class GolestanGradeChecker:
             if previous_grades is not None and previous_grades != given_grades:
                 diff = dict(set(given_grades.items()) - set(previous_grades.items()))
                 new_grades_message = self._create_grades_notif_message(diff)
-
+                self._send_notification(new_grades_message)
                 self._send_sms(new_grades_message)
 
             previous_grades = given_grades
