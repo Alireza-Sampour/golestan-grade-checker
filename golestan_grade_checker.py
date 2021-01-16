@@ -23,7 +23,6 @@ class GolestanGradeChecker:
         else:
             self.updater = None
         self.driver = self._setup_driver()
-        self._send_start_notification()
 
     def _setup_driver(self):
         # setup Firefox profile (you can use other browsers, but I prefer Firefox)
@@ -36,19 +35,13 @@ class GolestanGradeChecker:
         driver = webdriver.Firefox(fp, options=options)
         return driver
 
-    def _send_start_notification(self):
-        if self.config.os is 'OSx':
-            self._mac_notify("Golestan", 'By Ali_Tou', 'Golestan Grade Checker is running', sound_on=False)
-        else:
-            s.call(['notify-send', 'Golestan Grade Checker is running', 'By Ali_Tou'])
-
     def run(self):
         """
         Logins to Golestan, goes to desired semester page and loops over it to get new grades
         :return:
         """
         self._login_to_golestan()
-        sleep(20)
+        sleep(10)
         self._go_to_etelaate_jame_daneshjoo_page()
         sleep(7)
         self._go_to_semester()
@@ -72,7 +65,6 @@ class GolestanGradeChecker:
                 diff = dict(set(given_grades.items()) - set(previous_grades.items()))
                 new_grades_message = self._create_grades_notif_message(diff)
 
-                self._send_notification(new_grades_message)
                 self._send_sms(new_grades_message)
 
             previous_grades = given_grades
@@ -114,11 +106,13 @@ class GolestanGradeChecker:
         You may need to change xpath of username and password fields if according to your university login web page.
         """
         self.driver.get(self.config.login_url)
-        username_field = self.driver.find_element_by_xpath("""//input[@id="usename-field"]""")
-        password_field = self.driver.find_element_by_xpath("""//input[@id="password"]""")
+        username_field = self.driver.find_element_by_xpath("""//input[@name="uid"]""")
+        password_field = self.driver.find_element_by_xpath("""//input[@name="pass"]""")
         username_field.send_keys(self.config.username)
         password_field.send_keys(self.config.password)
         password_field.send_keys(Keys.ENTER)
+        sleep(3)
+        self.driver.find_element_by_link_text("""سامانه گلستان""").click()
 
     def _go_to_etelaate_jame_daneshjoo_page(self):
         """
@@ -196,39 +190,11 @@ class GolestanGradeChecker:
         """
         return ", ".join([f"{name}: {mark}" for (name, mark) in grades])
 
-    def _mac_notify(self, title, subtitle, message, sound_on):
-        title = '-title {!r}'.format(title)
-        sub = '-subtitle {!r}'.format(subtitle)
-        msg = '-message {!r}'.format(message)
-        sound = '-sound default' if sound_on else ''
-        os.system('terminal-notifier {}'.format(' '.join([msg, title, sub, sound])))
-
     def _send_notification(self, new_grades_message):
 
         print('You have new grades!')
         print(new_grades_message)
         print('---------')
-
-        if self.config.os == 'Osx':
-            self._mac_notify("Golestan",
-                             'Golestan Grade Checker',
-                             f'{self._add_time_prefix("You have new grades in golestan!")}\n{new_grades_message}',
-                             sound_on=True)
-        else:
-            # Play a beep sound (using sox)
-            s.call(['play',
-                    '--no-show-progress',
-                    '--null',
-                    '-t', 'alsa',
-                    '--channels', '1',
-                    'synth', '1',
-                    'sine', '330'])
-
-            # Send a desktop notification (using notify-send)
-            s.call(['notify-send',
-                    'Golestan Grade Checker',
-                    f'{self._add_time_prefix("You have new grades in golestan!")}\n{new_grades_message}'])
-
         if self.config.tg_notif:
             self.updater.bot.send_message(chat_id=self.config.tg_chat_id,
                                           text=f"You have new grades in golestan!\nGiven Grades are"
